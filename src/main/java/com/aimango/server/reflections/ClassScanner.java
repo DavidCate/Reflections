@@ -1,8 +1,11 @@
 package com.aimango.server.reflections;
 
+import com.aimango.server.annotation.Component;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -77,6 +80,22 @@ public class ClassScanner {
         }
     }
 
+    public static boolean isAnnotateWith(Class clazz, Class targetAnnotation){
+        if (clazz.equals(targetAnnotation)){
+            return true;
+        }
+        boolean annotationPresent = clazz.isAnnotationPresent(targetAnnotation);
+        if (annotationPresent){
+            return annotationPresent;
+        }else {
+            Annotation[] annotations = clazz.getAnnotations();
+            for (Annotation annotation:annotations){
+                boolean annotateWith = isAnnotateWith(annotation.annotationType(), targetAnnotation);
+                return annotateWith;
+            }
+           return false;
+        }
+    }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Set<Class> scan = ClassScanner.scan("com.aimango.server.component");
