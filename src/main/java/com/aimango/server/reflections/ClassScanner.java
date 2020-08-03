@@ -1,6 +1,4 @@
-package com.aimango.server.reflections;
-
-import com.aimango.server.annotation.Component;
+package com.aimango.robot.server.core.scanner;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -29,7 +27,7 @@ public class ClassScanner {
         Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("");
         while (resources.hasMoreElements()){
             URL url = resources.nextElement();
-            URLClassLoader urlClassLoader=new URLClassLoader(new URL[]{url},Thread.currentThread().getContextClassLoader());
+            URLClassLoader urlClassLoader=new URLClassLoader(new URL[]{url}, Thread.currentThread().getContextClassLoader());
             System.out.println(url.toString());
 
             String protocol = url.getProtocol();
@@ -81,20 +79,17 @@ public class ClassScanner {
     }
 
     public static boolean isAnnotateWith(Class clazz, Class targetAnnotation){
-        if (clazz.equals(targetAnnotation)){
-            return true;
-        }
-        boolean annotationPresent = clazz.isAnnotationPresent(targetAnnotation);
-        if (annotationPresent){
-            return annotationPresent;
-        }else {
-            Annotation[] annotations = clazz.getAnnotations();
-            for (Annotation annotation:annotations){
-                boolean annotateWith = isAnnotateWith(annotation.annotationType(), targetAnnotation);
-                return annotateWith;
+        Annotation[] annotations = clazz.getAnnotations();
+        for (Annotation annotation:annotations){
+            Class<? extends Annotation> aClass = annotation.annotationType();
+            if (aClass.equals(targetAnnotation)){
+                return true;
             }
-           return false;
+            if (aClass.isAnnotationPresent(targetAnnotation)){
+                return true;
+            }
         }
+        return false;
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
